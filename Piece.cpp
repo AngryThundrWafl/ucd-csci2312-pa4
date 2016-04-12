@@ -16,7 +16,7 @@ namespace Gaming {
                                         //leaving blank should destruct the class on its own
     }
     //Friend Function for piece class
-    std::ostream &Gaming::operator<<(std::ostream &os, const Piece &piece) {
+    std::ostream &operator<<(std::ostream &os, const Piece &piece) {
                                         //TODO need to return os and use inheritance for this function
     }
 }

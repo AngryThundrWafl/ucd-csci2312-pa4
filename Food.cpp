@@ -4,7 +4,7 @@
 #include "Food.h"
 namespace Gaming{
     //Provided from Pa4 read me
-    Food::FOOD_ID = 'F';
+   const char Food::FOOD_ID = 'F';
 
 }
 
