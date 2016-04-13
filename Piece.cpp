@@ -13,7 +13,7 @@ namespace Gaming {
     }
     //destructor for piece class
     Piece::~Piece() {
-                                        //leaving blank should destruct the class on its own
+                                        //TODO
     }
     //Friend Function for piece class
     std::ostream &operator<<(std::ostream &os, const Piece &piece) {
