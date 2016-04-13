@@ -63,7 +63,7 @@ namespace Gaming {
         unsigned int getNumResources() const;
         Status getStatus() const { return __status; }
         unsigned int getRound() const { return __round; }
-        const Piece *getPiece(unsigned int x, unsigned int y) const;
+        const Piece *getPiece(unsigned int x, unsigned int y) const;            //will return the piece??
 
         // grid population methods
         void addSimple(const Position &position);

@@ -103,7 +103,13 @@ namespace Gaming{
 
     //will get the amoutn of agents on the board
     unsigned int Game::getNumAgents() const {
-        return 0;
+       unsigned int numAgents = 0;
+
+        for(auto it = __grid.begin(); it != __grid.end(); it++){
+            Agent *agent = dynamic_cast<Agent*>(*it);
+            if(agent) numAgents++;
+        }
+        return numAgents;
     }
 
     //gets the amounnt of simple agents on the board
@@ -112,23 +118,38 @@ namespace Gaming{
 // or NULL if the derived type of the object is not of
 // the argument type
 
-        unsigned int numAgents = 0;
+        unsigned int numSimple = 0;
 
         for (auto it = __grid.begin(); it != __grid.end(); ++it) {
             Simple *simple = dynamic_cast<Simple*>(*it);
-            if (simple) numAgents ++;
+            if (simple) numSimple ++;
         }
 
-        return numAgents;
+        return numSimple;
 
     }
 
 
+    unsigned int Game::getNumStrategic() const {
+        unsigned int numStrategic = 0;
+        for(auto it = __grid.begin(); it != __grid.end(); ++it){
+            Strategic *strategic = dynamic_cast<Strategic*>(*it);
+            if(strategic) numStrategic++;
+        }
+        return numStrategic;
+    }
 
+    unsigned int Game::getNumResources() const {
+        unsigned int numResource = 0;
+        for(auto it = __grid.begin(); it != __grid.end(); it++){
+            Resource *resource = dynamic_cast<Resource*>(*it);
+            if(resource) numResource++;
+        }
+        return numResource;
+    }
 
-
-
-
-
+    const Piece *Game::getPiece(unsigned int x, unsigned int y) const {
+        //TODO would i return the piece that is at that location??
+    }
 }
 

@@ -31,7 +31,7 @@ namespace Gaming {
         // [3][4][5]
         // [6][7][8]
         // the piece is always at 1x1 (SELF)
-        std::array<PieceType, 9> array;
+        std::array<PieceType, 9> array;     //array that holds the surroundings
     };
 
     class PositionRandomizer {
