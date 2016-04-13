@@ -65,7 +65,7 @@ namespace Gaming{
             }
         }
     }
-
+//shiek
 //default constructor for game class
     Game::Game():__width(3), __height(3) {                                               //will make a __grid of 3 x 3
         for(int i = 0; i <(__width*__height);i++){
