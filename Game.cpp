@@ -24,7 +24,12 @@ namespace Gaming{
         std::default_random_engine gen;
         std::uniform_int_distribution<int> d(0, __width * __height);
         //TODO need to calculate num of strategic and set it equal to num startegic of int
-        int numStrategic = (int)((__width * __height) / NUM_INIT_AGENT_FACTOR / 2.0);   //calculates num strategic agents
+        __numInitAgents = (__width * __height) / NUM_INIT_AGENT_FACTOR;
+        __numInitResources = (__width * __height) / NUM_INIT_RESOURCE_FACTOR;
+        unsigned int numStrategic = __numInitAgents / 2;
+        unsigned int numSimple = __numInitAgents - numStrategic;
+        unsigned int numAdvantage = __numInitResources / 4;
+        unsigned int numFood = __numInitResources - numAdvantage;
 
     // populate Strategic agents
         while (numStrategic > 0) {
@@ -35,7 +40,7 @@ namespace Gaming{
                 numStrategic --;
             }
         }
-        int numSimple = numStrategic;                                                   //creates a variable called num simle
+                                                          //creates a variable called num simle
     //populate simple agents
         while(numSimple >0){
             int i = d(gen);                                                             //random index from the grid vector
@@ -46,7 +51,7 @@ namespace Gaming{
             }
         }
     // Note: you can reuse the generator
-        int numFood = ((__width * __height) / NUM_INIT_RESOURCE_FACTOR / 2);
+
         while(numFood > 0){
             int i = d(gen);
             if(__grid[i] == nullptr){
@@ -55,7 +60,7 @@ namespace Gaming{
                 numFood--;
             }
         }
-        int numAdvantage = numFood;
+
         while(numAdvantage > 0){
             int i = d(gen);
             if(__grid[i] == nullptr){
@@ -150,6 +155,88 @@ namespace Gaming{
 
     const Piece *Game::getPiece(unsigned int x, unsigned int y) const {
         //TODO would i return the piece that is at that location??
+        int location = x +(y* __width);         //will look for this location on the grid
+        return __grid[location];                //returns the location on the grid
+    }
+
+    void Game::addSimple(const Position &position) {
+        //exception for out of bounds
+        if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
+            throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
+        }
+        int location = position.x + (position.y * __width);
+        __grid[location] = new Simple(*this, position,STARTING_AGENT_ENERGY);
+
+    }
+
+    void Game::addSimple(const Position &position, double energy) {
+        //exception for out of bounds
+        if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
+            throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
+        }
+        int location = position.x + (position.y * __width);
+        __grid[location] = new Simple(*this, position,energy);
+    }
+
+    void Game::addSimple(unsigned x, unsigned y) {
+        //exception for out of bounds
+        if((x < 0 && x > getWidth()) || (y < 0 && y > getHeight())){
+            throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
+        }
+        Position pos(x,y);
+        int location = x + (y * __width);
+        __grid[location] = new Simple(*this, pos,STARTING_AGENT_ENERGY);
+    }
+
+    void Game::addSimple(unsigned x, unsigned y, double energy) {
+        //exception for out of bounds
+        if((x < 0 && x > getWidth()) || (y < 0 && y > getHeight())){
+            throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
+        }
+        Position pos(x,y);
+        int location = x + (y * __width);
+        __grid[location] = new Simple(*this, pos,energy);
+    }
+
+    void Game::addStrategic(const Position &position, Strategy *s) {
+        int location = position.x + (position.y * __width);
+        __grid[location] = new Strategic(*this, position, STARTING_AGENT_ENERGY, s);
+    }
+
+    void Game::addStrategic(unsigned x, unsigned y, Strategy *s) {
+        Position pos(x,y);
+        int location = x + (y * __width);
+        __grid[location] = new Strategic(*this, pos, STARTING_AGENT_ENERGY,s);
+    }
+
+    void Game::addFood(const Position &position) {
+        int location = position.x + (position.y * __width);
+        __grid[location] = new Food(*this, position,STARTING_RESOURCE_CAPACITY);
+    }
+
+    void Game::addFood(unsigned x, unsigned y) {
+        Position pos(x,y);
+        int location = x + (y * __width);
+        __grid[location] = new Food(*this, pos,STARTING_RESOURCE_CAPACITY);
+    }
+
+    void Game::addAdvantage(const Position &position) {
+        int location = position.x + (position.y * __width);
+        __grid[location] = new Advantage(*this, position, STARTING_RESOURCE_CAPACITY);
+    }
+
+    void Game::addAdvantage(unsigned x, unsigned y) {
+        Position pos(x,y);
+        int location = x +(y *__width);
+        __grid[location] = new Advantage(*this, pos, STARTING_RESOURCE_CAPACITY);
+    }
+
+    const Surroundings Game::getSurroundings(const Position &pos) const {
+        Surroundings surround;              // a array of class Surroundings
+        //Todo implement Surroundings
+        //Todo Fill the array with empty members except for self whivh is at 4
+
+        return surround;                    //will return the Surroundings
     }
 }
 
