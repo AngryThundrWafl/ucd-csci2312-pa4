@@ -268,7 +268,18 @@ namespace Gaming{
             search.y += 1;                                                //and the y
         }
 
+        //todo check if this works
         return surround;                    //will return the Surroundings
+    }
+
+    const ActionType Game::reachSurroundings(const Position &from, const Position &to) {
+        //base condition
+        if(from.x == to.x && from.y == to.y == from.x){
+            return  STAY;       //means that the piece stayed
+        }
+
+        if(to.x == from.x -1 && to.y == from.y -1)
+            return NW;
     }
 }
 
