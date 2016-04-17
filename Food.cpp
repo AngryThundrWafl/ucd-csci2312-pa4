@@ -3,6 +3,7 @@
 //
 #include "Food.h"
 #include<sstream>
+
 namespace Gaming{
     //Provided from Pa4 read me
    const char Food::FOOD_ID = 'F';

@@ -23,7 +23,7 @@ namespace Gaming{
     // sufficient for our casual purposes
         std::default_random_engine gen;
         std::uniform_int_distribution<int> d(0, __width * __height);
-        //TODO need to calculate num of strategic and set it equal to num startegic of int
+
         __numInitAgents = (__width * __height) / NUM_INIT_AGENT_FACTOR;
         __numInitResources = (__width * __height) / NUM_INIT_RESOURCE_FACTOR;
         unsigned int numStrategic = __numInitAgents / 2;
@@ -65,7 +65,7 @@ namespace Gaming{
             int i = d(gen);
             if(__grid[i] == nullptr){
                 Position pos(i / __width, i % __width);
-                __grid[i] = new Advantage(*this, pos, Game::STARTING_RESOURCE_CAPACITY); //used Resource
+                __grid[i] = new Advantage(*this, pos, STARTING_RESOURCE_CAPACITY); //used Resource
                 numAdvantage--;
             }
         }
@@ -232,9 +232,41 @@ namespace Gaming{
     }
 
     const Surroundings Game::getSurroundings(const Position &pos) const {
+        //todo  check why surround has no been initialized
         Surroundings surround;              // a array of class Surroundings
-        //Todo implement Surroundings
+
         //Todo Fill the array with empty members except for self whivh is at 4
+        for(int i = 0; i < 9; i++){     //i is less than nine since theres only 8 elements
+            if(i == 4){
+                surround.array[i] = SELF;
+            }
+            else
+                surround.array[i] = EMPTY;  //sets all elements to enum Empty
+        }
+        Position search;                    //will search for a postion
+        PieceType p;                        //what piece we will find
+        search.x = pos.x - 1;               // x and y that are passe into the function as pos
+        search.y = pos.y -1;
+        for(int i = 0; i < 3;i++){          //will traverse the i colms and j the rows of the grid
+            for(int j = 0; j < 3; j++) {
+                //base condtion where the position is outside the grid
+                if ((search.x < 0 || search.x > __width) || (search.y < 0 || search.y > __height)) {
+                    surround.array[i + (j * __width)] = INACCESSIBLE;        //will set that position as inaccesible
+                }
+                else {
+                    if (__grid[i + (j * __width)] != nullptr) {
+                        //base condition where it checks if that part of the grid has a object in it
+                        p = __grid[i + (j *
+                                        __width)]->getType();             //will get the type of piece or object that is at that part of the grid and will set that equal to our piece type variable p
+                        surround.array[i + (j * __width)] = p;
+                    }
+                    else
+                        surround.array[i + (j * __width)] = EMPTY;               //theres nothing in that index so we set that equal to empty
+                }
+            }
+            search.x = pos.x -1;                                                //used to reset x to what it should be
+            search.y += 1;                                                //and the y
+        }
 
         return surround;                    //will return the Surroundings
     }
