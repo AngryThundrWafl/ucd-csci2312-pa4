@@ -277,9 +277,48 @@ namespace Gaming{
         if(from.x == to.x && from.y == to.y == from.x){
             return  STAY;       //means that the piece stayed
         }
+        //WHERE THE PIECE MOVES (N,S,E,W,NE,NW,SE,SW)//////////////////
+        //todo check which one works for N
+        //if(to.x == from.x && to.y == from.y == to.y -1)
+        //return N
+        if(to.x == from.x && to.y == from.y -1)
+            return N;            //moved up one on grid
+        else if(to.x == from.x && to.y == from.y +1)
+            return S;           //moved down one on grid
+        else if(to.x == from.x + 1 && to.y == from.y)
+            return E;           //moved right on the grid
+        else if(to.x == from.x + 1 && to.y == from.y + 1)
+            return SE;          //moved down one and right one on the grid
+        else if(to.x == from.y +1 && to.y == from.y - 1)
+            return NE;          //moved up one and right one on the grid
+        else if(to.x == from.x -1 && to.y == from.y)
+            return W;           //moved left one on the grid
+        else if(to.x == from.x -1 && to.y == from.y - 1)
+            return NW;           //moved up one and left one
+        else if(to.x == from.x -1 && to.y == from.y -1)
+            return SW;          //moved down one and left one on the grid
+        ///////////END OF WHERE THE PiECE MOVES ON THE GRID////////////////
+    }
 
-        if(to.x == from.x -1 && to.y == from.y -1)
-            return NW;
+    bool Game::isLegal(const ActionType &ac, const Position &pos) const {
+        Surroundings surround;
+        surround = getSurroundings(pos);        //surround will be qual to the surroudings recieved from whats passed into th function pos
+        //bool isLeg = True     //or maybe false IDK
+        //todo switch statments or if statments where we will make each case in tha surrounds either true or false
+        //PASS action type into the switch
+        switch(ac){
+
+
+
+        }
+
+        //each case will be for what direction it moves in the switch statement
+        //todo////
+        //return isLeg;                 //if its true or false
+    }
+    //we assume legal and use isLegal
+    const Position Game::move(const Position &pos, const ActionType &ac) const {
+        return Gaming::Position();
     }
 }
 
