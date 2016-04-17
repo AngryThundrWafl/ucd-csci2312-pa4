@@ -18,7 +18,8 @@ namespace  Gaming{
     //strategy for agrressive agent
     ActionType AggressiveAgentStrategy::operator()(const Surroundings &s) const {
         //TODO implement so that the agent finds any means of play using if sttments
-
+        PositionRandomizer random;      //our random generator
+        
 
 
         return STAY;        // done last if no condtitioins meet the agressive agents startegy
