@@ -234,7 +234,7 @@ namespace Gaming{
         if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
             throw OutOfBoundsEx(__width, __height, position.x, position.y);
                 if (__grid[location])
-                    throw PositionNonemptyEx(position.x, position.y);
+                    throw PositionNonemptyEx(position.x,position.y);
         __grid[location] = new Strategic(*this, position, STARTING_AGENT_ENERGY, s);
     }
 
