@@ -2,9 +2,8 @@
 // Created by Brian on 4/7/2016.
 //
 
-#include "Advantage.h"
-#include "Food.h"
 #include "Agent.h"
+#include "Resource.h"
 
 namespace Gaming{
     //provided from Pa4 read me
@@ -45,7 +44,7 @@ namespace Gaming{
     }
     //agent interaction with resources
     Piece &Agent::interact(Resource *resource) {
-        addEnergy(resource->consume());     //resource gets consumed
+        //todo addEnergy(resource->consume());
         return *this;
     }
 }
