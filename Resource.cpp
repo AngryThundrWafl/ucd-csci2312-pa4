@@ -30,10 +30,12 @@ namespace Gaming{
 
     void Resource::age() {
         __capacity /= RESOURCE_SPOIL_FACTOR;
+        if(__capacity < 0.01)
+            __capacity =0;
     }
 
     Piece &Resource::interact(Agent *agent) {
-       // agent->addEnergy()
+        agent->addEnergy(consume());
         //todo
         return *this;
     }

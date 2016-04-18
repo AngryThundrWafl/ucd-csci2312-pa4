@@ -9,7 +9,7 @@ namespace Gaming {
     Piece::Piece(const Game &g, const Position &p) :__game(g), __position(p){           //puts g into game and p into position
         __finished = false;             //game will be initialized to false since it isnt ovr when its constructed LOL
         __turned = false;
-        __id = __idGen;                 //id will be intialized to the current id in idGen
+        __id = __idGen++;                 //id will be intialized to the current id in idGen
     }
     //destructor for piece class
     Piece::~Piece() {
@@ -17,6 +17,7 @@ namespace Gaming {
     }
     //Friend Function for piece class
     std::ostream &operator<<(std::ostream &os, const Piece &piece) {
-                                        //TODO need to return os and use inheritance for this function
+           piece.print(os);                        //TODO need to return os and use inheritance for this function
+            return os;
     }
 }
