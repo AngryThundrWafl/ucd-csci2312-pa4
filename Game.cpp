@@ -208,9 +208,11 @@ namespace Gaming{
         Position pos(x,y);
         int location = x + (y * __width);
         //exception for out of bounds
-        if(x < 0 || x >= __height || y < 0 && y > __width){
+        if(x < 0 || x >= __height || y < 0 && y > __width)
             throw OutOfBoundsEx(__width,__height,x,y);
-        }
+            if (__grid[location])
+                throw PositionNonemptyEx(x, y);
+
         __grid[location] = new Simple(*this, pos,STARTING_AGENT_ENERGY);
     }
 
@@ -221,6 +223,9 @@ namespace Gaming{
         if(x < 0 || x >= __width || y < 0 || y >= __height){
             throw OutOfBoundsEx(__width,__height,x,y);
         }
+        if (__grid[location])
+            throw PositionNonemptyEx(x, y);
+
         __grid[location] = new Simple(*this, pos,energy);
     }
 
