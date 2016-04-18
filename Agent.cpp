@@ -44,7 +44,7 @@ namespace Gaming{
     }
     //agent interaction with resources
     Piece &Agent::interact(Resource *resource) {
-        //todo addEnergy(resource->consume());
+        addEnergy(resource->consume());
         return *this;
     }
 }

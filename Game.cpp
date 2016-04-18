@@ -77,16 +77,24 @@ namespace Gaming{
     }
 //shiek
 //default constructor for game class
-    Game::Game():__width(3), __height(3) {                                               //will make a __grid of 3 x 3
+    Game::Game() {                                               //will make a __grid of 3 x 3
+        __width = MIN_WIDTH;
+        __height = MIN_HEIGHT;
+        __status = NOT_STARTED;
+
         for(int i = 0; i <(__width*__height);i++){
             __grid.push_back(nullptr);                                                  //will push null ptr to each element in the vector
         }
     }
 
 // note: manual population by default
-    Game::Game(unsigned width, unsigned height, bool manual):__width(width),__height(height) {
+    Game::Game(unsigned width, unsigned height, bool manual) {
         if (width < MIN_WIDTH || height < MIN_HEIGHT)
             throw InsufficientDimensionsEx(MIN_WIDTH, MIN_HEIGHT, width, height);
+        __width = MIN_WIDTH;
+        __height = MIN_HEIGHT;
+        __status = NOT_STARTED;
+
         for(int i = 0; i < __width * __height; i++) {
             __grid.push_back(nullptr);
         }
@@ -97,7 +105,10 @@ namespace Gaming{
 
     //destructor for Game class
     Game::~Game() {
-
+        //todo
+        for (auto it = __grid.begin(); it != __grid.end(); ++it)
+            if (*it != nullptr)
+                delete *it;
     }
 
     //will search the whole board of pieces
@@ -172,10 +183,13 @@ namespace Gaming{
 
     void Game::addSimple(const Position &position) {
         //exception for out of bounds
+        int location = position.y + (position.x * __width);
         if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
             throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
         }
-        int location = position.y + (position.x * __width);
+        if (__grid[location])
+            throw PositionNonemptyEx(position.x, position.y);
+
         __grid[location] = new Simple(*this, position,STARTING_AGENT_ENERGY);
 
     }
@@ -337,9 +351,11 @@ namespace Gaming{
     }
 
     bool Game::isLegal(const ActionType &ac, const Position &pos) const {
+        if (pos.x < 0 || pos.x >= __height || pos.y < 0 || pos.y >= __width)
+            throw OutOfBoundsEx(__width, __height, pos.x, pos.y);
         Surroundings surround;
         surround = getSurroundings(pos);        //surround will be qual to the surroudings recieved from whats passed into th function pos
-        bool isLeg = true;     //or maybe false IDK
+        bool isLeg = false;
         //todo switch statments or if statments where we will make each case in tha surrounds either true or false
         //PASS action type into the switch
         switch(ac){
@@ -438,24 +454,24 @@ namespace Gaming{
                 pos = (*it)->getPosition();                                          //will pass a pieces position or location in
                 action = (*it)->takeTurn(getSurroundings(pos));                     //piece takes a turn for each
                 Newpos = this->move(pos, action);                                   //passes the new location into the new variabale
-                location = Newpos.x + (Newpos.y * __width);
+                location = Newpos.y + (Newpos.x * __width);
                 pptr = __grid[location];
                 if (pptr != nullptr) {                                          //this happens if the piece wants to move to annother spot hwere there is another piece in it soit will challnege or cosume if its a resource
                     (*(*it) * *pptr);                                            //this means that the pieces interact and we will pass some if statmnts
                     if ((*it)->isViable()) {                                    //if it didn't get consumed we pass it set new position
                         (*it)->setPosition(Newpos);
-                        __grid[Newpos.x + (Newpos.y * __width)] = *it;                //will change the grid and set equal to it and also set it equal to nullptr
-                        __grid[pos.x + (pos.y * __width)] = nullptr;
+                        __grid[Newpos.y + (Newpos.x * __width)] = *it;                //will change the grid and set equal to it and also set it equal to nullptr
+                        __grid[pos.y + (pos.x * __width)] = nullptr;
                     }
                     else {                                                      //when a resource gets consumed you set that location = to null ptr
-                        __grid[pos.x + (pos.y * __width)] = nullptr;
+                        __grid[pos.y + (pos.x * __width)] = nullptr;
                     }
                 }
                 else {
-                    __grid[Newpos.x + (Newpos.y * __width)] = *it;              //else to the other staments if the position is emoyty
+                    __grid[Newpos.y + (Newpos.x * __width)] = *it;              //else to the other staments if the position is emoyty
                 }
             }
-        }//end of the loop
+        }
 
         for (int i = 0; i < __grid.size(); ++i) {
             if (!__grid[i]->isViable() && __grid[i] != nullptr) {
@@ -484,6 +500,19 @@ namespace Gaming{
 
     std::ostream &operator<<(std::ostream &os, const Game &game) {
         //todo work on print
+        int x = game.__width, y = game.__height;
+        os << "Round: " << game.__round << std::endl;
+        for (int i = 0; i < x; ++i) {
+            for (int j = 0; j < y; ++j) {
+                if (game.__grid[j + (i * (game.__width - 1))] == nullptr)
+                    os << "[     ]";
+                else
+                    os << std::setw(5) << game.__grid[j + (i * (game.__width - 1))] << "]";
+            }
+            os << std::endl;
+        }
+        os << "Status: " << game.getStatus() << std::endl;
+        return os;
     }
 }
 

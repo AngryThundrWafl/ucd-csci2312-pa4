@@ -7,7 +7,7 @@ namespace Gaming{
     //Provided from Pa4 read me
     const char Strategic::STRATEGIC_ID = 'T';
 
-    Strategic::Strategic(const Game &g, const Position &p, double energy, Strategy *s):Agent(g,p,__energy) {
+    Strategic::Strategic(const Game &g, const Position &p, double energy, Strategy *s):Agent(g,p,energy) {
         __strategy = s;         //will load the default strategy
     }
 
