@@ -7,7 +7,7 @@
 #include "Strategic.h"  //to find the strategic agents
 #include "Food.h"
 #include "Advantage.h"
-#include "Exceptions.h"
+#include "Piece.h"
 #include<set>
 #include<iomanip>
 
@@ -24,8 +24,8 @@ namespace Gaming{
 
     //used for populating grid (used in automatic random initialization of a Game)
     void Game::populate() {
-    // simple pseudo-random number generator
-    // sufficient for our casual purposes
+        // simple pseudo-random number generator
+        // sufficient for our casual purposes
         std::default_random_engine gen;
         std::uniform_int_distribution<int> d(0, __width * __height);
 
@@ -36,7 +36,7 @@ namespace Gaming{
         unsigned int numAdvantage = __numInitResources / 4;
         unsigned int numFood = __numInitResources - numAdvantage;
 
-    // populate Strategic agents
+        // populate Strategic agents
         while (numStrategic > 0) {
             int i = d(gen);                                                             // random index in the grid vector
             if (__grid[i] == nullptr) {                                                 // is position empty
@@ -45,8 +45,8 @@ namespace Gaming{
                 numStrategic --;
             }
         }
-                                                          //creates a variable called num simle
-    //populate simple agents
+        //creates a variable called num simle
+        //populate simple agents
         while(numSimple >0){
             int i = d(gen);                                                             //random index from the grid vector
             if(__grid[i] == nullptr){                                                   //is emptry equals nullptr
@@ -55,7 +55,7 @@ namespace Gaming{
                 numSimple--;
             }
         }
-    // Note: you can reuse the generator
+        // Note: you can reuse the generator
 
         while(numFood > 0){
             int i = d(gen);
@@ -77,56 +77,43 @@ namespace Gaming{
     }
 //shiek
 //default constructor for game class
-    Game::Game() {                                               //will make a __grid of 3 x 3
-        __width = MIN_WIDTH;
-        __height = MIN_HEIGHT;
-        __status = NOT_STARTED;
-
+    Game::Game():__width(3), __height(3) {                                               //will make a __grid of 3 x 3
         for(int i = 0; i <(__width*__height);i++){
             __grid.push_back(nullptr);                                                  //will push null ptr to each element in the vector
         }
     }
 
 // note: manual population by default
-    Game::Game(unsigned width, unsigned height, bool manual) {
-        if (width < MIN_WIDTH || height < MIN_HEIGHT)
-            throw InsufficientDimensionsEx(MIN_WIDTH, MIN_HEIGHT, width, height);
-        __width = MIN_WIDTH;
-        __height = MIN_HEIGHT;
-        __status = NOT_STARTED;
-
+    Game::Game(unsigned width, unsigned height, bool manual):__width(width),__height(height) {
         for(int i = 0; i < __width * __height; i++) {
             __grid.push_back(nullptr);
         }
-            if(!manual)
-                populate();
+        if(!manual)
+            populate();
 
     }
 
     //destructor for Game class
     Game::~Game() {
-        //todo
-        for (auto it = __grid.begin(); it != __grid.end(); ++it)
-            if (*it != nullptr)
-                delete *it;
+
     }
 
     //will search the whole board of pieces
     unsigned int Game::getNumPieces() const {
         //used the num grt simple function but instead used if statment to for spots that arent nullptr
-          unsigned int numPieces = 0;                                                   //will kepp count of how many pieces we have
+        unsigned int numPieces = 0;                                                   //will kepp count of how many pieces we have
 
-            for (auto it = __grid.begin(); it != __grid.end(); ++it) {
-                if(*it != nullptr){                                                     //if *it is not equal to nullptr then we increment numPieces since thats populated by a piece
-                    numPieces++;                                                        //increment
-                }
+        for (auto it = __grid.begin(); it != __grid.end(); ++it) {
+            if(*it != nullptr){                                                     //if *it is not equal to nullptr then we increment numPieces since thats populated by a piece
+                numPieces++;                                                        //increment
             }
-            return numPieces;                                                           //after all ietrations we return the number of pieces
         }
+        return numPieces;                                                           //after all ietrations we return the number of pieces
+    }
 
     //will get the amoutn of agents on the board
     unsigned int Game::getNumAgents() const {
-       unsigned int numAgents = 0;
+        unsigned int numAgents = 0;
 
         for(auto it = __grid.begin(); it != __grid.end(); it++){
             Agent *agent = dynamic_cast<Agent*>(*it);
@@ -173,124 +160,83 @@ namespace Gaming{
 
     const Piece *Game::getPiece(unsigned int x, unsigned int y) const {
         //TODO would i return the piece that is at that location??
-        int location = y +(x * __width);         //will look for this location on the grid
-        if (x < 0 || x >= __height || y < 0 || y >= __width)
-            throw OutOfBoundsEx(__width, __height, x, y);
-        if (__grid[location] == nullptr)
-            throw PositionEmptyEx(x, y);
+        int location = x +(y* __width);         //will look for this location on the grid
         return __grid[location];                //returns the location on the grid
     }
 
     void Game::addSimple(const Position &position) {
         //exception for out of bounds
-        int location = position.y + (position.x * __width);
         if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
             throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
         }
-        if (__grid[location])
-            throw PositionNonemptyEx(position.x, position.y);
-
+        int location = position.x + (position.y * __width);
         __grid[location] = new Simple(*this, position,STARTING_AGENT_ENERGY);
 
     }
 
     void Game::addSimple(const Position &position, double energy) {
         //exception for out of bounds
-        int location = position.y + (position.x * __width);
-         if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
-            throw OutOfBoundsEx(__width, __height, position.x, position.y);
-                if (__grid[location])
-                     throw PositionNonemptyEx(position.x, position.y);
+        if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
+            throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
+        }
+        int location = position.x + (position.y * __width);
         __grid[location] = new Simple(*this, position,energy);
     }
 
     void Game::addSimple(unsigned x, unsigned y) {
+        //exception for out of bounds
+        if((x < 0 && x > getWidth()) || (y < 0 && y > getHeight())){
+            throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
+        }
         Position pos(x,y);
         int location = x + (y * __width);
-        //exception for out of bounds
-        if(x < 0 || x >= __height || y < 0 && y > __width)
-            throw OutOfBoundsEx(__width,__height,x,y);
-            if (__grid[location])
-                throw PositionNonemptyEx(x, y);
-
         __grid[location] = new Simple(*this, pos,STARTING_AGENT_ENERGY);
     }
 
     void Game::addSimple(unsigned x, unsigned y, double energy) {
         //exception for out of bounds
-        Position pos(x,y);
-        int location = y + (x * __width);
-        if(x < 0 || x >= __width || y < 0 || y >= __height){
-            throw OutOfBoundsEx(__width,__height,x,y);
+        if((x < 0 && x > getWidth()) || (y < 0 && y > getHeight())){
+            throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
         }
-        if (__grid[location])
-            throw PositionNonemptyEx(x, y);
-
+        Position pos(x,y);
+        int location = x + (y * __width);
         __grid[location] = new Simple(*this, pos,energy);
     }
 
     void Game::addStrategic(const Position &position, Strategy *s) {
-        int location = position.y + (position.x * __width);
-        if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
-            throw OutOfBoundsEx(__width, __height, position.x, position.y);
-                if (__grid[location])
-                    throw PositionNonemptyEx(position.x,position.y);
+        int location = position.x + (position.y * __width);
         __grid[location] = new Strategic(*this, position, STARTING_AGENT_ENERGY, s);
     }
 
     void Game::addStrategic(unsigned x, unsigned y, Strategy *s) {
         Position pos(x,y);
-        int location = y + (x * __width);
-        if (x < 0 || x >= __height || y < 0 || y >= __width)
-            throw OutOfBoundsEx(__width, __height, x, y);
-                if (__grid[location])
-            		throw PositionNonemptyEx(x, y);
+        int location = x + (y * __width);
         __grid[location] = new Strategic(*this, pos, STARTING_AGENT_ENERGY,s);
     }
 
     void Game::addFood(const Position &position) {
-        int location = position.y + (position.x * __width);
-        if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
-            throw OutOfBoundsEx(__width, __height, position.x, position.y);
-                    if (__grid[location])
-                        throw PositionNonemptyEx(position.x, position.y);
+        int location = position.x + (position.y * __width);
         __grid[location] = new Food(*this, position,STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addFood(unsigned x, unsigned y) {
         Position pos(x,y);
-        int location = y + (x * __width);
-        if (x < 0 || x >= __height || y < 0 || y >= __width)
-            throw OutOfBoundsEx(__width, __height, x, y);
-                if (__grid[location])
-                    throw PositionNonemptyEx(x, y);
+        int location = x + (y * __width);
         __grid[location] = new Food(*this, pos,STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addAdvantage(const Position &position) {
-        int location = position.y + (position.x * __width);
-        if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
-            throw OutOfBoundsEx(__width, __height, position.x, position.y);
-                if (__grid[location])
-                	throw PositionNonemptyEx(position.x, position.y);
+        int location = position.x + (position.y * __width);
         __grid[location] = new Advantage(*this, position, STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addAdvantage(unsigned x, unsigned y) {
         Position pos(x,y);
-        int location = y +(x *__width);
-        if (x < 0 || x >= __height || y < 0 || y >= __width)
-            throw OutOfBoundsEx(__width, __height, x, y);
-                if (__grid[location])
-                	throw PositionNonemptyEx(x, y);
+        int location = x +(y *__width);
         __grid[location] = new Advantage(*this, pos, STARTING_RESOURCE_CAPACITY);
     }
 
     const Surroundings Game::getSurroundings(const Position &pos) const {
-        //exceptions
-        if (pos.x < 0 || pos.x >= __height || pos.y < 0 || pos.y >= __width)
-                	throw OutOfBoundsEx(__width, __height, pos.x, pos.y);
-
         //todo  check why surround has no been initialized
         Surroundings surround;              // a array of class Surroundings
 
@@ -302,26 +248,29 @@ namespace Gaming{
             else
                 surround.array[i] = EMPTY;  //sets all elements to enum Empty
         }
-        int x,y,i =0;
+        Position search;                    //will search for a postion
         PieceType p;                        //what piece we will find
-        for (int row = -1; row < 2; ++row) {//position x
-            x = pos.x + row;
-            for (int col = -1; col < 2; ++col) {//position y
-                y = pos.y + col;
-
-                if (x < 0 || x >= __height || y < 0 || y >= __width)
-                    surround.array[i] = INACCESSIBLE;
-                else {
-                    if (__grid[y + (x * __width)] && i != 4) {
-                        p = __grid[y + (x * __width)]->getType();
-                        surround.array[i] = p;
-                    }
+        search.x = pos.x - 1;               // x and y that are passe into the function as pos
+        search.y = pos.y -1;
+        for(int i = 0; i < 3;i++){          //will traverse the i colms and j the rows of the grid
+            for(int j = 0; j < 3; j++) {
+                //base condtion where the position is outside the grid
+                if ((search.x < 0 || search.x > __width) || (search.y < 0 || search.y > __height)) {
+                    surround.array[i + (j * __width)] = INACCESSIBLE;        //will set that position as inaccesible
                 }
-
-                ++i;
+                else {
+                    if (__grid[i + (j * __width)] != nullptr) {
+                        //base condition where it checks if that part of the grid has a object in it
+                        p = __grid[i + (j * __width)]->getType();             //will get the type of piece or object that is at that part of the grid and will set that equal to our piece type variable p
+                        surround.array[i + (j * __width)] = p;
+                    }
+                    else
+                        surround.array[i + (j * __width)] = EMPTY;               //theres nothing in that index so we set that equal to empty
+                }
             }
+            search.x = pos.x -1;                                                //used to reset x to what it should be
+            search.y += 1;                                                //and the y
         }
-
 
         //todo check if this works
         return surround;                    //will return the Surroundings
@@ -356,17 +305,15 @@ namespace Gaming{
     }
 
     bool Game::isLegal(const ActionType &ac, const Position &pos) const {
-        if (pos.x < 0 || pos.x >= __height || pos.y < 0 || pos.y >= __width)
-            throw OutOfBoundsEx(__width, __height, pos.x, pos.y);
         Surroundings surround;
         surround = getSurroundings(pos);        //surround will be qual to the surroudings recieved from whats passed into th function pos
-        bool isLeg = false;
+        bool isLeg = true;     //or maybe false IDK
         //todo switch statments or if statments where we will make each case in tha surrounds either true or false
         //PASS action type into the switch
         switch(ac){
             case N:
-            if (surround.array[1] != INACCESSIBLE) isLeg = true;
-            break;
+                if (surround.array[1] != INACCESSIBLE) isLeg = true;
+                break;
             case NE:
                 if (surround.array[2] != INACCESSIBLE) isLeg = true;
                 break;
@@ -402,7 +349,7 @@ namespace Gaming{
         if(isLegal(ac,pos)){
             switch(ac){
                 //when it goes left its ++ and right its -- for x
-                    //y goes down when its ++ and goes up when --
+                //y goes down when its ++ and goes up when --
                 case N:
                     shino.y--;      //y goes up one
                     break;
@@ -411,7 +358,7 @@ namespace Gaming{
                     shino.x++;
                     break;
                 case NW:
-                   shino.y--;       //y goes up one and left one
+                    shino.y--;       //y goes up one and left one
                     shino.x--;
                     break;
                 case W:
@@ -459,24 +406,24 @@ namespace Gaming{
                 pos = (*it)->getPosition();                                          //will pass a pieces position or location in
                 action = (*it)->takeTurn(getSurroundings(pos));                     //piece takes a turn for each
                 Newpos = this->move(pos, action);                                   //passes the new location into the new variabale
-                location = Newpos.y + (Newpos.x * __width);
+                location = Newpos.x + (Newpos.y * __width);
                 pptr = __grid[location];
                 if (pptr != nullptr) {                                          //this happens if the piece wants to move to annother spot hwere there is another piece in it soit will challnege or cosume if its a resource
                     (*(*it) * *pptr);                                            //this means that the pieces interact and we will pass some if statmnts
                     if ((*it)->isViable()) {                                    //if it didn't get consumed we pass it set new position
                         (*it)->setPosition(Newpos);
-                        __grid[Newpos.y + (Newpos.x * __width)] = *it;                //will change the grid and set equal to it and also set it equal to nullptr
-                        __grid[pos.y + (pos.x * __width)] = nullptr;
+                        __grid[Newpos.x + (Newpos.y * __width)] = *it;                //will change the grid and set equal to it and also set it equal to nullptr
+                        __grid[pos.x + (pos.y * __width)] = nullptr;
                     }
                     else {                                                      //when a resource gets consumed you set that location = to null ptr
-                        __grid[pos.y + (pos.x * __width)] = nullptr;
+                        __grid[pos.x + (pos.y * __width)] = nullptr;
                     }
                 }
                 else {
-                    __grid[Newpos.y + (Newpos.x * __width)] = *it;              //else to the other staments if the position is emoyty
+                    __grid[Newpos.x + (Newpos.y * __width)] = *it;              //else to the other staments if the position is emoyty
                 }
             }
-        }
+        }//end of the loop
 
         for (int i = 0; i < __grid.size(); ++i) {
             if (!__grid[i]->isViable() && __grid[i] != nullptr) {
@@ -506,6 +453,7 @@ namespace Gaming{
     std::ostream &operator<<(std::ostream &os, const Game &game) {
         //todo work on print
         int x = game.__width, y = game.__height;
+
         os << "Round: " << game.__round << std::endl;
         for (int i = 0; i < x; ++i) {
             for (int j = 0; j < y; ++j) {
@@ -517,7 +465,7 @@ namespace Gaming{
             os << std::endl;
         }
         os << "Status: " << game.getStatus() << std::endl;
+
         return os;
     }
 }
-

@@ -3,7 +3,7 @@
 //
 #include <iostream>
 #include <string>
-
+#include "Gaming.h"
 #include "Exceptions.h"
 
 
