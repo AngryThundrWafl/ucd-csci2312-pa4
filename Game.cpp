@@ -160,16 +160,16 @@ namespace Gaming{
 
     const Piece *Game::getPiece(unsigned int x, unsigned int y) const {
         //TODO would i return the piece that is at that location??
-        int location = x +(y* __width);         //will look for this location on the grid
+        int location = y +(x* __width);         //will look for this location on the grid
         return __grid[location];                //returns the location on the grid
     }
 
     void Game::addSimple(const Position &position) {
         //exception for out of bounds
+        int location = position.y + (position.x * __width);
         if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
             throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
         }
-        int location = position.x + (position.y * __width);
         __grid[location] = new Simple(*this, position,STARTING_AGENT_ENERGY);
 
     }
@@ -179,7 +179,7 @@ namespace Gaming{
         if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
             throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
         }
-        int location = position.x + (position.y * __width);
+        int location = position.y + (position.x * __width);
         __grid[location] = new Simple(*this, position,energy);
     }
 
@@ -189,7 +189,7 @@ namespace Gaming{
             throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
         }
         Position pos(x,y);
-        int location = x + (y * __width);
+        int location = y + (x * __width);
         __grid[location] = new Simple(*this, pos,STARTING_AGENT_ENERGY);
     }
 
@@ -199,44 +199,46 @@ namespace Gaming{
             throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
         }
         Position pos(x,y);
-        int location = x + (y * __width);
+        int location = y + (x * __width);
         __grid[location] = new Simple(*this, pos,energy);
     }
 
     void Game::addStrategic(const Position &position, Strategy *s) {
-        int location = position.x + (position.y * __width);
+        int location = position.y + (position.x * __width);
         __grid[location] = new Strategic(*this, position, STARTING_AGENT_ENERGY, s);
     }
 
     void Game::addStrategic(unsigned x, unsigned y, Strategy *s) {
         Position pos(x,y);
-        int location = x + (y * __width);
+        int location = y + (x * __width);
         __grid[location] = new Strategic(*this, pos, STARTING_AGENT_ENERGY,s);
     }
 
     void Game::addFood(const Position &position) {
-        int location = position.x + (position.y * __width);
+        int location = position.y + (position.x * __width);
         __grid[location] = new Food(*this, position,STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addFood(unsigned x, unsigned y) {
         Position pos(x,y);
-        int location = x + (y * __width);
+        int location = y + (x * __width);
         __grid[location] = new Food(*this, pos,STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addAdvantage(const Position &position) {
-        int location = position.x + (position.y * __width);
+        int location = position.y + (position.x * __width);
         __grid[location] = new Advantage(*this, position, STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addAdvantage(unsigned x, unsigned y) {
         Position pos(x,y);
-        int location = x +(y *__width);
+        int location = y +(x *__width);
         __grid[location] = new Advantage(*this, pos, STARTING_RESOURCE_CAPACITY);
     }
 
     const Surroundings Game::getSurroundings(const Position &pos) const {
+        if(pos.x < 0 || pos.x >= __height || pos.y >= __width)
+            throw OutOfBoundsEx(__width,__height,pos.x,pos.y);
         //todo  check why surround has no been initialized
         Surroundings surround;              // a array of class Surroundings
 
@@ -248,28 +250,29 @@ namespace Gaming{
             else
                 surround.array[i] = EMPTY;  //sets all elements to enum Empty
         }
-        Position search;                    //will search for a postion
-        PieceType p;                        //what piece we will find
-        search.x = pos.x - 1;               // x and y that are passe into the function as pos
-        search.y = pos.y -1;
-        for(int i = 0; i < 3;i++){          //will traverse the i colms and j the rows of the grid
-            for(int j = 0; j < 3; j++) {
+        //Position search;                    //will search for a postion
+        PieceType p;                            //what piece we will find
+        int pos1, pos2, counter =0;
+        //search.x = pos.x - 1;               // x and y that are passe into the function as pos
+        //search.y = pos.y -1;
+        for(int i = -1; i < 2;i++){          //will traverse the i colms and j the rows of the grid
+            pos1 = pos.x + i;   //finds the x cordinate
+            for(int j = -1; j < 2; j++) {
+                pos2 = pos.y + j;       //will find the y cordinate
                 //base condtion where the position is outside the grid
-                if ((search.x < 0 || search.x > __width) || (search.y < 0 || search.y > __height)) {
-                    surround.array[i + (j * __width)] = INACCESSIBLE;        //will set that position as inaccesible
+                if (pos1 < 0 || pos1 >= __height || pos2 < 0 || pos2 >= __width) {
+                    surround.array[counter] = INACCESSIBLE;        //will set that position as inaccesible
                 }
                 else {
-                    if (__grid[i + (j * __width)] != nullptr) {
+                    if (__grid[pos2 + (pos1 * __width)] != nullptr) {
                         //base condition where it checks if that part of the grid has a object in it
-                        p = __grid[i + (j * __width)]->getType();             //will get the type of piece or object that is at that part of the grid and will set that equal to our piece type variable p
-                        surround.array[i + (j * __width)] = p;
+                        p = __grid[pos2 + (pos1 * __width)]->getType();             //will get the type of piece or object that is at that part of the grid and will set that equal to our piece type variable p
+                        surround.array[counter] = p;
                     }
-                    else
-                        surround.array[i + (j * __width)] = EMPTY;               //theres nothing in that index so we set that equal to empty
                 }
+                counter++;      //will increment counter since the task did not find a move
             }
-            search.x = pos.x -1;                                                //used to reset x to what it should be
-            search.y += 1;                                                //and the y
+
         }
 
         //todo check if this works
@@ -278,28 +281,28 @@ namespace Gaming{
 
     const ActionType Game::reachSurroundings(const Position &from, const Position &to) {
         //base condition
-        if(from.x == to.x && from.y == to.y == from.x){
+        if(from.x == to.x && from.y == from.x){
             return  STAY;       //means that the piece stayed
         }
         //WHERE THE PIECE MOVES (N,S,E,W,NE,NW,SE,SW)//////////////////
         //todo check which one works for N
         //if(to.x == from.x && to.y == from.y == to.y -1)
         //return N
-        if(to.x == from.x && to.y == from.y -1)
+        if(to.x == from.x -1 && to.y == from.y)
             return N;            //moved up one on grid
-        else if(to.x == from.x && to.y == from.y +1)
+        else if(to.x == from.x+1 && to.y == from.y)
             return S;           //moved down one on grid
-        else if(to.x == from.x + 1 && to.y == from.y)
+        else if(to.x == from.x && to.y == from.y+1)
             return E;           //moved right on the grid
         else if(to.x == from.x + 1 && to.y == from.y + 1)
             return SE;          //moved down one and right one on the grid
-        else if(to.x == from.y +1 && to.y == from.y - 1)
+        else if(to.x == from.x-1 && to.y == from.y +1)
             return NE;          //moved up one and right one on the grid
-        else if(to.x == from.x -1 && to.y == from.y)
+        else if(to.x == from.x && to.y == from.y-1)
             return W;           //moved left one on the grid
         else if(to.x == from.x -1 && to.y == from.y - 1)
             return NW;           //moved up one and left one
-        else if(to.x == from.x -1 && to.y == from.y -1)
+        else if(to.x == from.x +1 && to.y == from.y -1)
             return SW;          //moved down one and left one on the grid
         ///////////END OF WHERE THE PiECE MOVES ON THE GRID////////////////
     }

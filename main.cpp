@@ -34,10 +34,10 @@ int main() {
    test_piece_aging(ec, NumIters);
    test_piece_energy(ec, NumIters);
    test_piece_turntaking(ec, NumIters);
-   //test_piece_interaction(ec, NumIters);
+  // test_piece_interaction(ec, NumIters);
 
    //// surroundings tests
-   //test_surroundings_smoketest(ec);
+  // test_surroundings_smoketest(ec);
 
    //// action tests
    //test_action_smoketest(ec);
