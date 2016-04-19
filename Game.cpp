@@ -315,28 +315,36 @@ namespace Gaming{
         //PASS action type into the switch
         switch(ac){
             case N:
-                if (surround.array[1] != INACCESSIBLE) isLeg = true;
+                if (surround.array[1] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case NE:
-                if (surround.array[2] != INACCESSIBLE) isLeg = true;
+                if (surround.array[2] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case NW:
-                if (surround.array[0] != INACCESSIBLE) isLeg = true;
+                if (surround.array[0] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case E:
-                if (surround.array[5] != INACCESSIBLE) isLeg = true;
+                if (surround.array[5] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case W:
-                if (surround.array[3] != INACCESSIBLE) isLeg = true;
+                if (surround.array[3] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case SE:
-                if (surround.array[8] != INACCESSIBLE) isLeg = true;
+                if (surround.array[8] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case SW:
-                if (surround.array[6] != INACCESSIBLE) isLeg = true;
+                if (surround.array[6] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case S:
-                if (surround.array[7] != INACCESSIBLE) isLeg = true;
+                if (surround.array[7] != INACCESSIBLE)
+                    isLeg = true;
                 break;
             case STAY:
                 isLeg = true;
@@ -391,6 +399,7 @@ namespace Gaming{
     }
 
     void Game::round() {
+        //using the set example algorithm from the read me
         std::set<Piece*> grid;
         Position pos, Newpos;
         ActionType action;
@@ -450,7 +459,7 @@ namespace Gaming{
                 std::cout << this;
         }
         if (__verbose)
-            std::cout << this;          //this will print out the location aka the cordinates of the pieces when the game is finished
+            std::cout << *this;          //this will print out the location aka the cordinates of the pieces when the game is finished
     }
 
     std::ostream &operator<<(std::ostream &os, const Game &game) {
