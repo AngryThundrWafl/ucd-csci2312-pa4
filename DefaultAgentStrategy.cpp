@@ -81,6 +81,7 @@ namespace Gaming{
 
         //if surround returns all false it is unable to remove so it will return stay
         return STAY;
+        //todo include a switch statment for each movement case
     }
 
 }
