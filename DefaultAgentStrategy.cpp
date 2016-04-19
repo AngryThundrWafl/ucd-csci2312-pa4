@@ -72,7 +72,7 @@ namespace Gaming{
             }
             location = ways[gen() % ways.size()];
         }
-
+        else
         //if surround returns all false it is unable to remove so it will return stay
         return STAY;
         //todo include a switch statment for each movement case
@@ -82,16 +82,16 @@ namespace Gaming{
                 p.y = mid.y -1;
                 break;
             case 2:
-                p.x = mid.x;
+                p.x = mid.x-1;
                 p.y = mid.y;
                 break;
             case 3:
-                p.x = mid.x;
-                p.y = mid.y;
+                p.x = mid.x-1;
+                p.y = mid.y+1;
                 break;
             case 4:
                 p.x = mid.x;
-                p.y = mid.y;
+                p.y = mid.y-1;
                 break;
             case 5:
                 p.x = mid.x;
@@ -99,21 +99,22 @@ namespace Gaming{
                 break;
             case 6:
                 p.x = mid.x;
-                p.y = mid.y;
+                p.y = mid.y+1;
                 break;
             case 7:
-                p.x = mid.x;
-                p.y = mid.y;
+                p.x = mid.x+1;
+                p.y = mid.y-1;
                 break;
             case 8:
-                p.x = mid.x;
+                p.x = mid.x+1;
                 p.y = mid.y;
                 break;
             case 9:
-                p.x = mid.x;
-                p.y = mid.y;
+                p.x = mid.x+1;
+                p.y = mid.y+1;
                 break;
         }
+        return Game::reachSurroundings(p,mid);
     }
 
 }
