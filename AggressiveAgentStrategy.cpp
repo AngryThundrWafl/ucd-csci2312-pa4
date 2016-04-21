@@ -3,6 +3,7 @@
 //
 #include "Game.h"                   //for Game::Starting.....
 #include "AggressiveAgentStrategy.h"
+#include <ctime>
 
 namespace  Gaming{
     //Provided from PA4 read me
@@ -20,11 +21,12 @@ namespace  Gaming{
         //TODO implement so that the agent finds any means of play using if sttments
         std::vector<int> ways;
         PositionRandomizer random;      //our random generator
-        Position p, middle(1,1);
+        Position p, mid(1,1);
+        int location;
+        std::default_random_engine gen(time(0));
         bool surround[4] = { false, false, false, false };
         for (int i = 0; i < 8; ++i) {
-            if ((s.array[i] == SIMPLE || s.array[i] == STRATEGIC) &&
-                __agentEnergy >= DEFAULT_AGGRESSION_THRESHOLD)                              //checks if theres any agents in the vicinity
+            if ((s.array[i] == SIMPLE || s.array[i] == STRATEGIC) && __agentEnergy >= DEFAULT_AGGRESSION_THRESHOLD)                              //checks if theres any agents in the vicinity
                 surround[0] = true;
             else if (s.array[i] == ADVANTAGE)                                               //checks for advantage on the grid and dos that if there arent any agents
                 surround[1] = true;
@@ -38,16 +40,14 @@ namespace  Gaming{
                 if (s.array[i] == SIMPLE || s.array[i] == STRATEGIC)
                     ways.push_back(i);
             }
-            p = random(ways);
-            return Game::reachSurroundings(middle, p);
+            location = ways[gen() % ways.size()];
         }
         else if (surround[1]) {                                                             //moves to advantage if no agents were true
             for (int i = 0; i < 8; ++i) {
                 if (s.array[i] == ADVANTAGE)
                     ways.push_back(i);
             }
-            p = random(ways);
-            return Game::reachSurroundings(middle, p);
+            location = ways[gen() % ways.size()];
         }
         else if (surround[2]) {                                                             //moves to food if that point in the array is true
             for (int i = 0; i < 8; ++i) {
@@ -55,19 +55,57 @@ namespace  Gaming{
                     ways.push_back(i);
             }
 
-            p = random(ways);
-            return Game::reachSurroundings(middle, p);
+            location = ways[gen() % ways.size()];
         }
         else if (surround[3]) {                                                             //moves to empty space if true
             for (int i = 0; i < 8; ++i) {
                 if (s.array[i] == EMPTY)
                     ways.push_back(i);
             }
-            p = random(ways);
-            return Game::reachSurroundings(middle, p);
+            location = ways[gen() % ways.size()];
         }
-        //if all the elements = false then noconditions are met for the agent to move
-        return STAY;
+        else//if all the elements = false then noconditions are met for the agent to move
+            return STAY;
+
+        switch(location){       //each case will be for each part of the surroundings in the array
+            case 0:
+                p.x = mid.x -1;
+                p.y = mid.y -1;
+                break;
+            case 1:
+                p.x = mid.x-1;
+                p.y = mid.y;
+                break;
+            case 2:
+                p.x = mid.x-1;
+                p.y = mid.y+1;
+                break;
+            case 3:
+                p.x = mid.x;
+                p.y = mid.y-1;
+                break;
+            case 4:
+                p.x = mid.x;
+                p.y = mid.y;
+                break;
+            case 5:
+                p.x = mid.x;
+                p.y = mid.y+1;
+                break;
+            case 6:
+                p.x = mid.x+1;
+                p.y = mid.y-1;
+                break;
+            case 7:
+                p.x = mid.x+1;
+                p.y = mid.y;
+                break;
+            case 8:
+                p.x = mid.x+1;
+                p.y = mid.y+1;
+                break;
+        }
+        return Game::reachSurroundings(mid, p);
     }
 }
 

@@ -27,7 +27,7 @@ namespace Gaming{
         // simple pseudo-random number generator
         // sufficient for our casual purposes
         std::default_random_engine gen;
-        std::uniform_int_distribution<int> d(0, __width * __height);
+        std::uniform_int_distribution<int> d(0, __width * __height - 1);
 
         __numInitAgents = (__width * __height) / NUM_INIT_AGENT_FACTOR;
         __numInitResources = (__width * __height) / NUM_INIT_RESOURCE_FACTOR;
@@ -77,7 +77,10 @@ namespace Gaming{
     }
 //shiek
 //default constructor for game class
-    Game::Game():__width(3), __height(3) {                                               //will make a __grid of 3 x 3
+    Game::Game():__width(MIN_WIDTH), __height(MIN_HEIGHT) {
+        __status = NOT_STARTED;
+        __verbose = false;
+        //will make a __grid of 3 x 3
         for(int i = 0; i <(__width*__height);i++){
             __grid.push_back(nullptr);                                                  //will push null ptr to each element in the vector
         }
@@ -85,6 +88,12 @@ namespace Gaming{
 
 // note: manual population by default
     Game::Game(unsigned width, unsigned height, bool manual):__width(width),__height(height) {
+        if (height < MIN_HEIGHT || width < MIN_WIDTH)
+        {
+            throw InsufficientDimensionsEx(MIN_WIDTH, MIN_HEIGHT, width, height);
+        }
+        __status = NOT_STARTED;
+        __verbose = false;
         for(int i = 0; i < __width * __height; i++) {
             __grid.push_back(nullptr);
         }
@@ -95,7 +104,11 @@ namespace Gaming{
 
     //destructor for Game class
     Game::~Game() {
-
+        for(auto it = __grid.begin(); it != __grid.end();it++)
+        {
+            if(*it != nullptr)
+                delete *it;
+        }
     }
 
     //will search the whole board of pieces
@@ -281,6 +294,7 @@ namespace Gaming{
 
     const ActionType Game::reachSurroundings(const Position &from, const Position &to) {
         //base condition
+        //if(from.x == to.x && from.y == to.y){
         if(from.x == to.x && from.y == from.x){
             return  STAY;       //means that the piece stayed
         }
@@ -362,32 +376,32 @@ namespace Gaming{
                 //when it goes left its ++ and right its -- for x
                 //y goes down when its ++ and goes up when --
                 case N:
-                    shino.y--;      //y goes up one
+                    shino.x--;      //y goes up one
                     break;
                 case NE:
-                    shino.y--;      //y goes up one and right one
-                    shino.x++;
+                    shino.x--;      //y goes up one and right one
+                    shino.y++;
                     break;
                 case NW:
                     shino.y--;       //y goes up one and left one
                     shino.x--;
                     break;
                 case W:
-                    shino.x--;      //x gors lrft onr
+                    shino.y--;      //x gors lrft onr
                     break;
                 case E:
-                    shino.x++;      //x goes right one
+                    shino.y++;      //x goes right one
                     break;
                 case S:
-                    shino.y++;      //y goes down one
+                    shino.x++;      //y goes down one
                     break;
                 case SE:
                     shino.y++;      //y goes down one and x goes righ one
                     shino.x++;
                     break;
                 case SW:
-                    shino.y++;      //y goes down and x goes left one
-                    shino.x--;
+                    shino.x++;      //y goes down and x goes left one
+                    shino.y--;
                     break;
                 case STAY:          //we leave STAY blank since the piece does not move ta all
 
@@ -407,36 +421,37 @@ namespace Gaming{
         int location;
         for (auto it = __grid.begin(); it < __grid.end(); ++it) {
             if (*it != nullptr) {
-                grid.insert(*it);
+                grid.insert(grid.end(),*it);
                 (*it)->setTurned(false);                                            //resets the pieces so that they can take a turn this will reset after each round
             }
         }
         for (auto it = grid.begin(); it != grid.end(); ++it) {
-            if ((*it)->isViable()) {
+            if ((*it)->isViable()&& (*it)->getTurned()) {
                 (*it)->age();
                 (*it)->setTurned(true);
                 pos = (*it)->getPosition();                                          //will pass a pieces position or location in
                 action = (*it)->takeTurn(getSurroundings(pos));                     //piece takes a turn for each
                 Newpos = this->move(pos, action);                                   //passes the new location into the new variabale
-                location = Newpos.x + (Newpos.y * __width);
+                location = Newpos.y + (Newpos.x * __width);
                 pptr = __grid[location];
-                if (pptr != nullptr) {                                          //this happens if the piece wants to move to annother spot hwere there is another piece in it soit will challnege or cosume if its a resource
-                    (*(*it) * *pptr);                                            //this means that the pieces interact and we will pass some if statmnts
-                    if ((*it)->isViable()) {                                    //if it didn't get consumed we pass it set new position
+                if(pos.x != Newpos.x && pos.y != Newpos.y){                         //checks if new pos and the current pos arent n the same location
+                    if (pptr != nullptr) {                                                  //this happens if the piece wants to move to annother spot hwere there is another piece in it soit will challnege or cosume if its a resource
+                        (*(*it)* *pptr);                                            //this means that the pieces interact and we will pass some if statmnts
+                     if ((*it)->isViable()) {                                    //if it didn't get consumed we pass it set new position
                         (*it)->setPosition(Newpos);
-                        __grid[Newpos.x + (Newpos.y * __width)] = *it;                //will change the grid and set equal to it and also set it equal to nullptr
-                        __grid[pos.x + (pos.y * __width)] = nullptr;
+                        __grid[Newpos.y + (Newpos.x * __width)] = *it;                //will change the grid and set equal to it and also set it equal to nullptr
+                        __grid[pos.y + (pos.x * __width)] = nullptr;
                     }
                     else {                                                      //when a resource gets consumed you set that location = to null ptr
-                        __grid[pos.x + (pos.y * __width)] = nullptr;
+                        __grid[pos.y + (pos.x * __width)] = nullptr;
                     }
                 }
+                }
                 else {
-                    __grid[Newpos.x + (Newpos.y * __width)] = *it;              //else to the other staments if the position is emoyty
+                    __grid[Newpos.y + (Newpos.x * __width)] = *it;              //else to the other staments if the position is emoyty
                 }
             }
-        }//end of the loop
-
+        }
         for (int i = 0; i < __grid.size(); ++i) {
             if (!__grid[i]->isViable() && __grid[i] != nullptr) {
                 delete __grid[i];
@@ -445,6 +460,8 @@ namespace Gaming{
         }
         if (getNumResources() == 0)
             this->__status = OVER;
+        //we need to increment the round after it is over
+        __round++;
     }
 
     void Game::play(bool verbose) {
@@ -456,10 +473,10 @@ namespace Gaming{
         while (__status != OVER) {
             round();                    //if the status of the game is not over the game will comtimue to play through
             if (__verbose)              //this will show what was going on the game when the game eas not over
-                std::cout << this;
+                std::cout << *this;
         }
         if (__verbose)
-            std::cout << *this;          //this will print out the location aka the cordinates of the pieces when the game is finished
+            std::cout << this;          //this will print out the location aka the cordinates of the pieces when the game is finished
     }
 
     std::ostream &operator<<(std::ostream &os, const Game &game) {

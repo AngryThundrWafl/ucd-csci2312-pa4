@@ -72,44 +72,43 @@ namespace Gaming{
             }
             location = ways[gen() % ways.size()];
         }
-        else
-        //if surround returns all false it is unable to remove so it will return stay
+        else//if surround returns all false it is unable to remove so it will return stay
         return STAY;
         //todo include a switch statment for each movement case
         switch(location){       //each case will be for each part of the surroundings in the array
-            case 1:
+            case 0:
                 p.x = mid.x -1;
                 p.y = mid.y -1;
                 break;
-            case 2:
+            case 1:
                 p.x = mid.x-1;
                 p.y = mid.y;
                 break;
-            case 3:
+            case 2:
                 p.x = mid.x-1;
                 p.y = mid.y+1;
+                break;
+            case 3:
+                p.x = mid.x;
+                p.y = mid.y-1;
                 break;
             case 4:
                 p.x = mid.x;
-                p.y = mid.y-1;
+                p.y = mid.y;
                 break;
             case 5:
                 p.x = mid.x;
-                p.y = mid.y;
-                break;
-            case 6:
-                p.x = mid.x;
                 p.y = mid.y+1;
                 break;
-            case 7:
+            case 6:
                 p.x = mid.x+1;
                 p.y = mid.y-1;
                 break;
-            case 8:
+            case 7:
                 p.x = mid.x+1;
                 p.y = mid.y;
                 break;
-            case 9:
+            case 8:
                 p.x = mid.x+1;
                 p.y = mid.y+1;
                 break;
