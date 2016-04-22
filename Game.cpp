@@ -7,7 +7,6 @@
 #include "Strategic.h"  //to find the strategic agents
 #include "Food.h"
 #include "Piece.h"
-#include "Exceptions.h"
 #include "Advantage.h"
 #include<set>
 #include<iomanip>
@@ -212,15 +211,13 @@ namespace Gaming{
     }
 
     void Game::addSimple(unsigned x, unsigned y) {
-        //exception for out of bounds
+        Position pos(x, y);
         int location = y + (x * __width);
-        if(x < 0 || x >= __width || y < 0 || y >= __height){
-            throw OutOfBoundsEx(__width,__height,x,y);
-        }
+        if (x < 0 || x >= __height || y < 0 || y >= __width)
+            throw OutOfBoundsEx(__width, __height, x, y);
         if (__grid[location])
             throw PositionNonemptyEx(x, y);
-        Position pos(x,y);
-        __grid[location] = new Simple(*this, pos,STARTING_AGENT_ENERGY);
+        __grid[location] = new Simple(*this, pos, STARTING_AGENT_ENERGY);
     }
 
     void Game::addSimple(unsigned x, unsigned y, double energy) {
