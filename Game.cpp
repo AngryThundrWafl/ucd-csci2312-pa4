@@ -80,8 +80,8 @@ namespace Gaming{
         __width = MIN_WIDTH;
         __height = MIN_HEIGHT;
         __status = NOT_STARTED;
-        __verbose = false;
-        __round =0;
+       // __verbose = false;
+        //__round =0;
         //will make a __grid of 3 x 3
         for(int i = 0; i <(__width*__height);i++){
             __grid.push_back(nullptr);                                                  //will push null ptr to each element in the vector
@@ -90,15 +90,14 @@ namespace Gaming{
 
 // note: manual population by default
     Game::Game(unsigned width, unsigned height, bool manual) {
-        if (height < MIN_HEIGHT || width < MIN_WIDTH)
-        {
+        if (width < MIN_WIDTH || height < MIN_HEIGHT)
             throw InsufficientDimensionsEx(MIN_WIDTH, MIN_HEIGHT, width, height);
-        }
+
         __width = width;
         __height = height;
         __status = NOT_STARTED;
-        __verbose = false;
-        __round = 0;
+        //__verbose = false;
+       // __round = 0;
         for(int i = 0; i < __width * __height; i++) {
             __grid.push_back(nullptr);
         }
@@ -179,78 +178,116 @@ namespace Gaming{
     const Piece *Game::getPiece(unsigned int x, unsigned int y) const {
         //TODO would i return the piece that is at that location??
         int location = y +(x* __width);         //will look for this location on the grid
+        if (x < 0 || x >= __height || y < 0 || y >= __width)
+            throw OutOfBoundsEx(__width, __height, x, y);
+        if (__grid[location] == nullptr)
+            throw PositionEmptyEx(x, y);
+
         return __grid[location];                //returns the location on the grid
     }
 
     void Game::addSimple(const Position &position) {
         //exception for out of bounds
         int location = position.y + (position.x * __width);
-        if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
-            throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
+        if(position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width){
+            throw OutOfBoundsEx(__width,__height,position.x,position.y);
         }
+        if(__grid[location])
+            throw PositionNonemptyEx(position.x,position.y);
         __grid[location] = new Simple(*this, position,STARTING_AGENT_ENERGY);
 
     }
 
     void Game::addSimple(const Position &position, double energy) {
         //exception for out of bounds
-        if((position.x < 0 && position.x > getWidth()) || (position.y < 0 && position.y > getHeight())){
-            throw OutOfBoundsEx(getWidth(),getHeight(),position.x,position.y);
-        }
         int location = position.y + (position.x * __width);
+        if(position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width){
+            throw OutOfBoundsEx(__width,__height,position.x,position.y);
+        }
+        if(__grid[location])
+            throw PositionNonemptyEx(position.x,position.y);
         __grid[location] = new Simple(*this, position,energy);
     }
 
     void Game::addSimple(unsigned x, unsigned y) {
         //exception for out of bounds
-        if((x < 0 && x > getWidth()) || (y < 0 && y > getHeight())){
-            throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
-        }
-        Position pos(x,y);
         int location = y + (x * __width);
+        if(x < 0 || x >= __width || y < 0 || y >= __height){
+            throw OutOfBoundsEx(__width,__height,x,y);
+        }
+        if (__grid[location])
+            throw PositionNonemptyEx(x, y);
+        Position pos(x,y);
         __grid[location] = new Simple(*this, pos,STARTING_AGENT_ENERGY);
     }
 
     void Game::addSimple(unsigned x, unsigned y, double energy) {
         //exception for out of bounds
-        if((x < 0 && x > getWidth()) || (y < 0 && y > getHeight())){
-            throw OutOfBoundsEx(getWidth(),getHeight(),x,y);
-        }
+
         Position pos(x,y);
         int location = y + (x * __width);
+        if (x < 0 || x >= __height || y < 0 || y >= __width)
+            throw OutOfBoundsEx(__width, __height, x, y);
+        if (__grid[location])
+            throw PositionNonemptyEx(x, y);
         __grid[location] = new Simple(*this, pos,energy);
     }
 
     void Game::addStrategic(const Position &position, Strategy *s) {
         int location = position.y + (position.x * __width);
+        if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
+        throw OutOfBoundsEx(__width, __height, position.x, position.y);
+        if (__grid[location])
+            throw PositionNonemptyEx(position.x, position.y);
+
         __grid[location] = new Strategic(*this, position, STARTING_AGENT_ENERGY, s);
     }
 
     void Game::addStrategic(unsigned x, unsigned y, Strategy *s) {
         Position pos(x,y);
         int location = y + (x * __width);
+        if (x < 0 || x >= __height || y < 0 || y >= __width)
+            throw OutOfBoundsEx(__width, __height, x, y);
+        if (__grid[location])
+            throw PositionNonemptyEx(x, y);
         __grid[location] = new Strategic(*this, pos, STARTING_AGENT_ENERGY,s);
     }
 
     void Game::addFood(const Position &position) {
         int location = position.y + (position.x * __width);
+        if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
+            throw OutOfBoundsEx(__width, __height, position.x, position.y);
+        if (__grid[location])
+            throw PositionNonemptyEx(position.x, position.y);
         __grid[location] = new Food(*this, position,STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addFood(unsigned x, unsigned y) {
         Position pos(x,y);
         int location = y + (x * __width);
+        if (x < 0 || x >= __height || y < 0 || y >= __width)
+            throw OutOfBoundsEx(__width, __height, x, y);
+        if (__grid[location])
+            throw PositionNonemptyEx(x, y);
         __grid[location] = new Food(*this, pos,STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addAdvantage(const Position &position) {
         int location = position.y + (position.x * __width);
+        if (position.x < 0 || position.x >= __height || position.y < 0 || position.y >= __width)
+            throw OutOfBoundsEx(__width, __height, position.x, position.y);
+        if (__grid[location])
+            throw PositionNonemptyEx(position.x, position.y);
         __grid[location] = new Advantage(*this, position, STARTING_RESOURCE_CAPACITY);
     }
 
     void Game::addAdvantage(unsigned x, unsigned y) {
         Position pos(x,y);
         int location = y +(x *__width);
+        if (x < 0 || x >= __height || y < 0 || y >= __width)
+            throw OutOfBoundsEx(__width, __height, x, y);
+        if (__grid[location])
+            throw PositionNonemptyEx(x, y);
         __grid[location] = new Advantage(*this, pos, STARTING_RESOURCE_CAPACITY);
     }
 
@@ -326,9 +363,12 @@ namespace Gaming{
     }
 
     bool Game::isLegal(const ActionType &ac, const Position &pos) const {
+        //exceptiond
+        if (pos.x < 0 || pos.x >= __height || pos.y < 0 || pos.y >= __width)
+            throw OutOfBoundsEx(__width, __height, pos.x, pos.y);
         Surroundings surround;
         surround = getSurroundings(pos);        //surround will be qual to the surroudings recieved from whats passed into th function pos
-        bool isLeg = true;     //or maybe false IDK
+        bool isLeg = false;     //or maybe false IDK
         //todo switch statments or if statments where we will make each case in tha surrounds either true or false
         //PASS action type into the switch
         switch(ac){
@@ -457,7 +497,8 @@ namespace Gaming{
             }
         }
         for (int i = 0; i < __grid.size(); ++i) {
-            if (!__grid[i]->isViable() && __grid[i] != nullptr) {
+            //if (!__grid[i]->isViable() && __grid[i] != nullptr) {
+            if(__grid[i] != nullptr && !__grid[i]->isViable()){
                 delete __grid[i];
                 __grid[i] = nullptr;
             }

@@ -2,9 +2,7 @@
 // Created by Brian on 4/7/2016.
 //
 #include <iostream>
-#include <string>
 #include "Gaming.h"
-#include "Exceptions.h"
 
 
 using namespace std;
