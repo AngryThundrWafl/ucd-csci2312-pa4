@@ -7,7 +7,6 @@
 #include "Strategic.h"  //to find the strategic agents
 #include "Food.h"
 #include "Advantage.h"
-#include "Piece.h"
 #include<set>
 #include<iomanip>
 
@@ -27,7 +26,7 @@ namespace Gaming{
         // simple pseudo-random number generator
         // sufficient for our casual purposes
         std::default_random_engine gen;
-        std::uniform_int_distribution<int> d(0, __width * __height - 1);
+        std::uniform_int_distribution<int> d(0, __width * __height-1);
 
         __numInitAgents = (__width * __height) / NUM_INIT_AGENT_FACTOR;
         __numInitResources = (__width * __height) / NUM_INIT_RESOURCE_FACTOR;
@@ -41,7 +40,7 @@ namespace Gaming{
             int i = d(gen);                                                             // random index in the grid vector
             if (__grid[i] == nullptr) {                                                 // is position empty
                 Position pos(i / __width, i % __width);
-                __grid[i] = new Strategic(*this, pos, STARTING_AGENT_ENERGY);     //used strategic
+                __grid[i] = new Strategic(*this, pos, Game::STARTING_AGENT_ENERGY);     //used strategic
                 numStrategic --;
             }
         }
@@ -51,7 +50,7 @@ namespace Gaming{
             int i = d(gen);                                                             //random index from the grid vector
             if(__grid[i] == nullptr){                                                   //is emptry equals nullptr
                 Position pos(i / __width, i % __width);
-                __grid[i] = new Simple(*this, pos, STARTING_AGENT_ENERGY);        //used simple
+                __grid[i] = new Simple(*this, pos, Game::STARTING_AGENT_ENERGY);        //used simple
                 numSimple--;
             }
         }
@@ -61,7 +60,7 @@ namespace Gaming{
             int i = d(gen);
             if(__grid[i] == nullptr){
                 Position pos(i / __width, i % __width);
-                __grid[i] = new Food(*this, pos,STARTING_RESOURCE_CAPACITY);     //used food
+                __grid[i] = new Food(*this, pos,Game::STARTING_RESOURCE_CAPACITY);     //used food
                 numFood--;
             }
         }
@@ -70,16 +69,19 @@ namespace Gaming{
             int i = d(gen);
             if(__grid[i] == nullptr){
                 Position pos(i / __width, i % __width);
-                __grid[i] = new Advantage(*this, pos, STARTING_RESOURCE_CAPACITY); //used Resource
+                __grid[i] = new Advantage(*this, pos, Game::STARTING_RESOURCE_CAPACITY); //used Resource
                 numAdvantage--;
             }
         }
     }
 //shiek
 //default constructor for game class
-    Game::Game():__width(MIN_WIDTH), __height(MIN_HEIGHT) {
+    Game::Game() {
+        __width = MIN_WIDTH;
+        __height = MIN_HEIGHT;
         __status = NOT_STARTED;
         __verbose = false;
+        __round =0;
         //will make a __grid of 3 x 3
         for(int i = 0; i <(__width*__height);i++){
             __grid.push_back(nullptr);                                                  //will push null ptr to each element in the vector
@@ -87,13 +89,16 @@ namespace Gaming{
     }
 
 // note: manual population by default
-    Game::Game(unsigned width, unsigned height, bool manual):__width(width),__height(height) {
+    Game::Game(unsigned width, unsigned height, bool manual) {
         if (height < MIN_HEIGHT || width < MIN_WIDTH)
         {
             throw InsufficientDimensionsEx(MIN_WIDTH, MIN_HEIGHT, width, height);
         }
+        __width = width;
+        __height = height;
         __status = NOT_STARTED;
         __verbose = false;
+        __round = 0;
         for(int i = 0; i < __width * __height; i++) {
             __grid.push_back(nullptr);
         }
@@ -277,7 +282,7 @@ namespace Gaming{
                     surround.array[counter] = INACCESSIBLE;        //will set that position as inaccesible
                 }
                 else {
-                    if (__grid[pos2 + (pos1 * __width)] != nullptr) {
+                    if (__grid[pos2 + (pos1 * __width)] && counter !=4) {
                         //base condition where it checks if that part of the grid has a object in it
                         p = __grid[pos2 + (pos1 * __width)]->getType();             //will get the type of piece or object that is at that part of the grid and will set that equal to our piece type variable p
                         surround.array[counter] = p;
@@ -285,7 +290,6 @@ namespace Gaming{
                 }
                 counter++;      //will increment counter since the task did not find a move
             }
-
         }
 
         //todo check if this works
@@ -295,7 +299,7 @@ namespace Gaming{
     const ActionType Game::reachSurroundings(const Position &from, const Position &to) {
         //base condition
         //if(from.x == to.x && from.y == to.y){
-        if(from.x == to.x && from.y == from.x){
+        if(from.x == to.x && from.y == to.y){
             return  STAY;       //means that the piece stayed
         }
         //WHERE THE PIECE MOVES (N,S,E,W,NE,NW,SE,SW)//////////////////
@@ -414,18 +418,18 @@ namespace Gaming{
 
     void Game::round() {
         //using the set example algorithm from the read me
-        std::set<Piece*> grid;
+        std::set<Piece*> board;
         Position pos, Newpos;
         ActionType action;
         Piece* pptr;
         int location;
         for (auto it = __grid.begin(); it < __grid.end(); ++it) {
             if (*it != nullptr) {
-                grid.insert(grid.end(),*it);
+                board.insert(board.end(),*it);
                 (*it)->setTurned(false);                                            //resets the pieces so that they can take a turn this will reset after each round
             }
         }
-        for (auto it = grid.begin(); it != grid.end(); ++it) {
+        for (auto it = board.begin(); it != board.end(); ++it) {
             if ((*it)->isViable()&& (*it)->getTurned()) {
                 (*it)->age();
                 (*it)->setTurned(true);

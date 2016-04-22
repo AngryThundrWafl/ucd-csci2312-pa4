@@ -22,7 +22,7 @@ namespace Gaming{
         Position p, mid(1,1);
         std::vector<int> ways;
         int location;                                       //will hold the location of the piece
-
+        std::default_random_engine gen(time(0));
         //loop to check if theres any pieces
         for(int i = 0; i < 8; i++){
             if(s.array[i] == ADVANTAGE){
@@ -38,7 +38,6 @@ namespace Gaming{
                 surround[3] = true;     //checks if theres a simple piece
             }
         }
-        std::default_random_engine gen(time(0));
         //todo if statements for each instance of bool surround
         if (surround[0]) {
             //advatage is prioity
@@ -113,7 +112,7 @@ namespace Gaming{
                 p.y = mid.y+1;
                 break;
         }
-        return Game::reachSurroundings(p,mid);
+        return Game::reachSurroundings(mid,p);
     }
 
 }
